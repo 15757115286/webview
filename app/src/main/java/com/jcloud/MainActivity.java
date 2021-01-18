@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         final WebView webView = (WebView) findViewById(R.id.wv);
         // 设置 WebView 允许执行 JavaScript 脚本
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
         webView.addJavascriptInterface(new AndroidInterface(context), "android");
         // 确保跳转到另一个网页时仍然在当前 WebView 中显示
         // 而不是调用浏览器打开
