@@ -3,6 +3,8 @@ package com.jcloud;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -10,7 +12,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.Toast;
+
+import com.jcloud.demo.QRCodeActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +27,15 @@ public class MainActivity extends AppCompatActivity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        Button button=findViewById(R.id.id);
         this.createWebView();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this, QRCodeActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
     }
 
     /* 创建 WebView 实例 */

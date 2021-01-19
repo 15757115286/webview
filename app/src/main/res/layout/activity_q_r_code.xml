@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".demo.QRCodeActivity">
 
-    <!-- 展示一个 WebView -->
-    <WebView
-        android:id="@+id/wv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
     <Button
+        android:id="@+id/btn_scan"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/id"
-        android:text="跳转"
-        tools:ignore="MissingConstraints"></Button>
+        android:layout_height="60dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:onClick="loadScanKitBtnClick"
+        android:text="扫一扫"
+        tools:ignore="MissingConstraints" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
