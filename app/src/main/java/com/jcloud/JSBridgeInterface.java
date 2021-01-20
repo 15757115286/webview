@@ -10,10 +10,13 @@ import android.widget.Toast;
 
 import com.jcloud.demo.QRCodeActivity;
 
-public class AndroidInterface {
+public class JSBridgeInterface {
     private MainActivity activity;
     private WebView webview;
-    AndroidInterface(MainActivity activity, WebView webview) {
+    public final static int CODE_SUCCESS = 0;
+    public final static int CODE_FAIL = -1;
+    public final static int CODE_CANCEL_SCAN = -2;
+    JSBridgeInterface(MainActivity activity, WebView webview) {
 
         this.activity = activity;
         this.webview = webview;
@@ -26,21 +29,24 @@ public class AndroidInterface {
 
     @JavascriptInterface
     public void scan() {
-        // this.activity.scan();
-        this.transferDataToWebView("from android");
+        this.activity.scan();
     }
 
     @JavascriptInterface
     public void toast(String message) {
-        // this.activity.scan();
         Toast.makeText(this.activity, message, Toast.LENGTH_LONG).show();
     }
 
-    public void transferDataToWebView(String result) {
-        webview.evaluateJavascript("javascript:callJS()", new ValueCallback<String>(){
+    public void transferDataToWebView(String type, int code, String result) {
+        this.activity.runOnUiThread(new Runnable() {
             @Override
-           public void onReceiveValue(String s) {
-                toast("s");
+            public void run() {
+                String script = "javascript:__android_js_bridge_channel('%s', %d, '%s')";
+                webview.evaluateJavascript(String.format(script, type, code, result), new ValueCallback<String>(){
+                    @Override
+                    public void onReceiveValue(String s) {
+                    }
+                });
             }
         });
     }

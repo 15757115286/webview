@@ -5,33 +5,27 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.huawei.hms.hmsscankit.ScanKitActivity;
 import com.huawei.hms.hmsscankit.ScanUtil;
 import com.huawei.hms.ml.scan.HmsScan;
 import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
-import com.jcloud.demo.QRCodeActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int CAMERA_REQ_CODE = 111;
     public static final int DECODE = 1;
     private static final int REQUEST_CODE_SCAN_ONE = 0X01;
+    private WebView webview;
 
-    private AndroidInterface bridge;
+    public JSBridgeInterface jsBridge;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,14 +44,16 @@ public class MainActivity extends AppCompatActivity {
         // 创建 WebView 实例并通过 id 绑定我们刚在布局中创建的 WebView 标签
         // 这里的 R.id.webview 就是 activity_main.xml 中的 WebView 标签的 id
         final WebView webView = (WebView) findViewById(R.id.wv);
+        this.webview = webView;
+        JSBridgeInterface bridge = new JSBridgeInterface(activity, webView);
+        this.jsBridge = bridge;
         // 设置 WebView 允许执行 JavaScript 脚本
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
-        AndroidInterface bridge = new AndroidInterface(activity, webView);
-        webView.addJavascriptInterface(bridge, "bridge");
+        webView.addJavascriptInterface(bridge, "androidJSBridge");
         // 确保跳转到另一个网页时仍然在当前 WebView 中显示
         // 而不是调用浏览器打开
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient());
         // 设置 WebView 的按键监听器，覆写监听器的 onKey 函数，对返回键作特殊处理
         // 当 WebView 可以返回到上一个页面时回到上一个页面
         webView.setOnKeyListener(new View.OnKeyListener() {
@@ -128,14 +124,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK || data == null) {
+            jsBridge.transferDataToWebView("scanResult", JSBridgeInterface.CODE_CANCEL_SCAN, "cancel");
             return;
         }
         if (requestCode == REQUEST_CODE_SCAN_ONE) {
             HmsScan obj = data.getParcelableExtra(ScanUtil.RESULT);
             if (obj != null) {
                 String result = obj.originalValue;
-                // Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-                bridge.transferDataToWebView(result);
+                jsBridge.transferDataToWebView("scanResult", JSBridgeInterface.CODE_SUCCESS, result);
             }
         }
     }
